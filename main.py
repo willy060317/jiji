@@ -3,7 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import sqlite3, json
 from datetime import datetime
-
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 app = FastAPI()
 
 app.add_middleware(
@@ -48,3 +49,6 @@ def counts():
         "SELECT region, COUNT(*) as cnt FROM applications GROUP BY region"
     ).fetchall()
     return {row[0]: row[1] for row in rows}
+@app.get("/")
+def root():
+    return FileResponse("index.html")
