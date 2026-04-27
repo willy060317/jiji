@@ -320,7 +320,7 @@ let phoneVal = '';
 
 async function loadCounts() {
   try {
-    const res = await fetch('http://127.0.0.1:8000/counts');
+    const res = await fetch('https://web-production-cf4fa.up.railway.app/counts');
     const data = await res.json();
     for (const [region, cnt] of Object.entries(data)) {
       const el = document.getElementById('cnt-' + region);
@@ -413,7 +413,7 @@ async function submit() {
   }
 
   try {
-    await fetch('http://127.0.0.1:8000/apply', {
+    await fetch('https://web-production-cf4fa.up.railway.app', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
