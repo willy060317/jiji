@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관리자 페이지</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #f5f4f0;
+    min-height: 100vh;
+    padding: 2rem 1.5rem;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+
+  .btn-excel {
+    background: #16a34a;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 18px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: background 0.15s;
+  }
+
+  .btn-excel:hover { background: #15803d; }
+
+  .stats {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+
+  .stat-card {
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 13px;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .stat-card strong {
+    font-size: 18px;
+    font-weight: 700;
+    color: #2563eb;
+  }
+
+  .table-wrap {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #e8e8e8;
+    overflow: hidden;
+  }
+
+  .table-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .table-header span {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+
+  .search-input {
+    padding: 7px 12px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    font-size: 13px;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: #1a1a1a;
+    width: 200px;
+  }
+
+  .search-input:focus { outline: none; border-color: #2563eb; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  thead th {
+    background: #f9f9f7;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 500;
+    color: #888;
+    border-bottom: 1px solid #f0f0f0;
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #f5f5f5;
+    transition: background 0.1s;
+  }
+
+  tbody tr:hover { background: #fafafa; }
+  tbody tr:last-child { border-bottom: none; }
+
+  tbody td {
+    padding: 10px 14px;
+    color: #1a1a1a;
+    vertical-align: middle;
+  }
+
+  .region-badge {
+    background: #eff4ff;
+    color: #2563eb;
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .product-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .product-tag {
+    background: #f3f4f6;
+    color: #555;
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-size: 11px;
+  }
+
+  .btn-delete {
+    background: transparent;
+    border: 1px solid #fca5a5;
+    color: #dc2626;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: all 0.12s;
+  }
+
+  .btn-delete:hover { background: #fef2f2; }
+
+  .empty {
+    text-align: center;
+    padding: 3rem;
+    color: #aaa;
+    font-size: 14px;
+  }
+
+  .date-text {
+    color: #aaa;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>신청 관리</h1>
+  <button class="btn-excel" onclick="exportCSV()">엑셀 다운로드</button>
+</header>
+
+<div class="stats" id="stats"></div>
+
+<div class="table-wrap">
+  <div class="table-header">
+    <span id="total-label">전체 0건</span>
+    <input class="search-input" type="text" placeholder="이름 또는 지역 검색" oninput="filterTable(this.value)" />
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>지역</th>
+        <th>이름</th>
+        <th>전화번호</th>
+        <th>설치 항목</th>
+        <th>신청일시</th>
+        <th>삭제</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<script>
+const API = '';
+const productLabels = {
+  aircon: '에어컨',
+  tv: 'TV 벽걸이',
+  cctv: 'CCTV',
+  led: 'LED 조명',
+  shelf: '선반·수납'
+};
+
+let allData = [];
+
+async function loadData() {
+  try {
+    const res = await fetch(API + '/applications');
+    allData = await res.json();
+    renderStats();
+    renderTable(allData);
+  } catch(e) {
+    document.getElementById('tbody').innerHTML = '<tr><td colspan="7" class="empty">데이터를 불러오지 못했습니다.</td></tr>';
+  }
+}
+
+function renderStats() {
+  const counts = {};
+  allData.forEach(r => {
+    counts[r.region] = (counts[r.region] || 0) + 1;
+  });
+  const statsEl = document.getElementById('stats');
+  let html = `<div class="stat-card">전체 <strong>${allData.length}</strong>명</div>`;
+  for (const [region, cnt] of Object.entries(counts)) {
+    html += `<div class="stat-card">${region} <strong>${cnt}</strong>명</div>`;
+  }
+  statsEl.innerHTML = html;
+}
+
+function renderTable(data) {
+  document.getElementById('total-label').textContent = `전체 ${data.length}건`;
+  const tbody = document.getElementById('tbody');
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" class="empty">신청 내역이 없습니다.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(r => {
+    let products = [];
+    try { products = JSON.parse(r.products); } catch(e) { products = [r.products]; }
+    const productHTML = products.map(p => `<span class="product-tag">${productLabels[p] || p}</span>`).join('');
+    const date = r.created_at ? r.created_at.substring(0, 16).replace('T', ' ') : '';
+    return `
+      <tr id="row-${r.id}">
+        <td style="color:#aaa;">${r.id}</td>
+        <td><span class="region-badge">${r.region}</span></td>
+        <td><strong>${r.name}</strong></td>
+        <td>${r.phone}</td>
+        <td><div class="product-tags">${productHTML}</div></td>
+        <td class="date-text">${date}</td>
+        <td><button class="btn-delete" onclick="deleteRow(${r.id})">삭제</button></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function filterTable(query) {
+  const q = query.trim().toLowerCase();
+  if (!q) { renderTable(allData); return; }
+  const filtered = allData.filter(r =>
+    r.name.toLowerCase().includes(q) || r.region.toLowerCase().includes(q) || r.phone.includes(q)
+  );
+  renderTable(filtered);
+}
+
+async function deleteRow(id) {
+  if (!confirm('정말 삭제하시겠습니까?')) return;
+  await fetch(API + '/applications/' + id, { method: 'DELETE' });
+  allData = allData.filter(r => r.id !== id);
+  renderStats();
+  renderTable(allData);
+}
+
+function exportCSV() {
+  window.location.href = API + '/export';
+}
+
+loadData();
+</script>
+</body>
+</html>

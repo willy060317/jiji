@@ -6,6 +6,9 @@ import os, json
 from datetime import datetime
 import psycopg2
 from psycopg2.extras import RealDictCursor
+import csv
+from io import StringIO
+from fastapi.responses import StreamingResponse
 
 app = FastAPI()
 
@@ -72,6 +75,10 @@ def counts():
     cur.close()
     conn.close()
     return {row[0]: row[1] for row in rows}
+@app.get("/admin")
+def admin():
+    return FileResponse("admin.html")
+
 @app.get("/applications")
 def get_applications():
     conn = get_conn()
@@ -84,3 +91,33 @@ def get_applications():
         {"id": r[0], "region": r[1], "name": r[2], "phone": r[3], "products": r[4], "created_at": r[5]}
         for r in rows
     ]
+
+@app.delete("/applications/{app_id}")
+def delete_application(app_id: int):
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM applications WHERE id = %s", (app_id,))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return {"ok": True}
+
+@app.get("/export")
+def export_csv():
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("SELECT id, region, name, phone, products, created_at FROM applications ORDER BY created_at DESC")
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+    output = StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["ID", "지역", "이름", "전화번호", "제품", "신청일시"])
+    for r in rows:
+        writer.writerow([r[0], r[1], r[2], r[3], r[4], r[5]])
+    output.seek(0)
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=applications.csv"}
+    )
