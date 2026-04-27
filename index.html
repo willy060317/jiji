@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>전국 출장 설치 서비스</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #f5f4f0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 6px;
+  }
+
+  header p {
+    font-size: 14px;
+    color: #777;
+  }
+
+  .map-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .map-wrap svg {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.08));
+  }
+
+  .region-btn {
+    position: absolute;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #1a1a1a;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    transition: all 0.15s;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+
+  .region-btn:hover {
+    background: #f0f0f0;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  }
+
+  .region-btn .badge {
+    background: #2563eb;
+    color: #fff;
+    border-radius: 10px;
+    padding: 1px 7px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  /* 모달 */
+  .modal-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: 1rem;
+  }
+
+  .modal-bg.open { display: flex; }
+
+  .modal {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 340px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  }
+
+  .modal-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 2px;
+  }
+
+  .modal-step {
+    font-size: 12px;
+    color: #aaa;
+    margin-bottom: 1.2rem;
+  }
+
+  .modal label {
+    font-size: 13px;
+    color: #555;
+    display: block;
+    margin-top: 12px;
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+
+  .modal input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    font-size: 14px;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: #1a1a1a;
+    background: #fafafa;
+    transition: border 0.15s;
+  }
+
+  .modal input:focus {
+    outline: none;
+    border-color: #2563eb;
+    background: #fff;
+  }
+
+  .product-list {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .product-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1px solid #e8e8e8;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #1a1a1a;
+    background: #fafafa;
+    transition: all 0.12s;
+    font-family: 'Noto Sans KR', sans-serif;
+  }
+
+  .product-item:hover { background: #f0f4ff; border-color: #b3c6ff; }
+
+  .product-item.selected {
+    border-color: #2563eb;
+    background: #eff4ff;
+    color: #1d4ed8;
+    font-weight: 500;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 1.2rem;
+  }
+
+  .btn-primary {
+    flex: 1;
+    padding: 11px;
+    border-radius: 10px;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: background 0.15s;
+  }
+
+  .btn-primary:hover { background: #1d4ed8; }
+
+  .btn-secondary {
+    padding: 11px 16px;
+    border-radius: 10px;
+    background: transparent;
+    color: #888;
+    border: 1px solid #e0e0e0;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: background 0.15s;
+  }
+
+  .btn-secondary:hover { background: #f5f5f5; }
+
+  .success-box {
+    text-align: center;
+    padding: 1rem 0;
+  }
+
+  .success-icon {
+    font-size: 42px;
+    margin-bottom: 12px;
+  }
+
+  .success-box h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+  }
+
+  .success-box p {
+    font-size: 13px;
+    color: #777;
+    line-height: 1.7;
+  }
+
+  .info-bar {
+    margin-top: 2rem;
+    max-width: 420px;
+    width: 100%;
+    background: #fff;
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    border: 1px solid #e8e8e8;
+    font-size: 13px;
+    color: #555;
+    line-height: 1.7;
+  }
+
+  .info-bar strong { color: #2563eb; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>전국 출장 설치 서비스</h1>
+  <p>지역을 선택하고 설치를 신청하세요. 인원이 모이면 방문 일정을 안내드립니다.</p>
+</header>
+
+<div class="map-wrap" id="mapWrap">
+  <svg viewBox="0 0 300 440" xmlns="http://www.w3.org/2000/svg">
+    <!-- 서울·경기 -->
+    <path d="M85,60 L110,50 L140,55 L155,70 L150,95 L135,105 L115,110 L95,100 L80,85 Z" fill="#dbeafe" stroke="#93c5fd" stroke-width="1"/>
+    <!-- 강원 -->
+    <path d="M155,70 L185,60 L210,65 L220,85 L215,110 L200,125 L180,130 L160,120 L150,105 L150,95 Z" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="1"/>
+    <!-- 충청 -->
+    <path d="M80,85 L95,100 L115,110 L135,105 L150,105 L160,120 L155,145 L140,160 L115,165 L90,155 L75,140 L70,115 Z" fill="#dcfce7" stroke="#86efac" stroke-width="1"/>
+    <!-- 경북 -->
+    <path d="M160,120 L180,130 L200,125 L215,140 L220,165 L210,185 L190,195 L170,190 L155,175 L155,155 L155,145 Z" fill="#fef9c3" stroke="#fde047" stroke-width="1"/>
+    <!-- 전라 -->
+    <path d="M75,140 L90,155 L115,165 L125,185 L120,210 L105,230 L85,240 L65,235 L50,215 L50,190 L58,165 Z" fill="#f3e8ff" stroke="#c084fc" stroke-width="1"/>
+    <!-- 경남·부산 -->
+    <path d="M155,175 L170,190 L190,195 L200,215 L195,235 L175,248 L155,250 L135,240 L125,220 L125,205 L125,185 L140,175 Z" fill="#ffe4e6" stroke="#fca5a5" stroke-width="1"/>
+    <!-- 제주 -->
+    <path d="M75,310 L100,305 L115,315 L110,335 L90,342 L70,335 L65,320 Z" fill="#fce7f3" stroke="#f9a8d4" stroke-width="1"/>
+
+    <!-- 지역 텍스트 -->
+    <text x="115" y="83" font-size="9" fill="#1e40af" text-anchor="middle" font-family="sans-serif">서울·경기</text>
+    <text x="185" y="97" font-size="9" fill="#0369a1" text-anchor="middle" font-family="sans-serif">강원</text>
+    <text x="112" y="135" font-size="9" fill="#15803d" text-anchor="middle" font-family="sans-serif">충청</text>
+    <text x="188" y="160" font-size="9" fill="#854d0e" text-anchor="middle" font-family="sans-serif">경북</text>
+    <text x="87" y="195" font-size="9" fill="#7e22ce" text-anchor="middle" font-family="sans-serif">전라</text>
+    <text x="163" y="218" font-size="9" fill="#9f1239" text-anchor="middle" font-family="sans-serif">경남·부산</text>
+    <text x="91" y="325" font-size="9" fill="#9d174d" text-anchor="middle" font-family="sans-serif">제주</text>
+  </svg>
+
+  <button class="region-btn" style="top:14%;left:2%;" onclick="openModal('서울·경기')">서울·경기 <span class="badge" id="cnt-서울·경기">0</span></button>
+  <button class="region-btn" style="top:14%;right:2%;" onclick="openModal('강원')">강원 <span class="badge" id="cnt-강원">0</span></button>
+  <button class="region-btn" style="top:34%;left:2%;" onclick="openModal('충청')">충청 <span class="badge" id="cnt-충청">0</span></button>
+  <button class="region-btn" style="top:34%;right:2%;" onclick="openModal('경북')">경북 <span class="badge" id="cnt-경북">0</span></button>
+  <button class="region-btn" style="top:54%;left:2%;" onclick="openModal('전라')">전라 <span class="badge" id="cnt-전라">0</span></button>
+  <button class="region-btn" style="top:54%;right:2%;" onclick="openModal('경남·부산')">경남·부산 <span class="badge" id="cnt-경남·부산">0</span></button>
+  <button class="region-btn" style="top:76%;left:15%;" onclick="openModal('제주')">제주 <span class="badge" id="cnt-제주">0</span></button>
+</div>
+
+<div class="info-bar">
+  목표 인원이 모이면 <strong>문자로 일정을 안내</strong>드립니다. 꿈꾸는 삼촌 직접 방문합니다.
+</div>
+
+<!-- 모달 -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal" id="modalBox"></div>
+</div>
+
+<script>
+const products = [
+  { id: 'aircon', label: '에어컨', icon: '❄️' },
+  { id: 'tv', label: 'TV 벽걸이', icon: '📺' },
+  { id: 'cctv', label: 'CCTV', icon: '📷' },
+  { id: 'led', label: 'LED 조명', icon: '💡' },
+  { id: 'shelf', label: '선반·수납', icon: '🪜' },
+];
+
+let currentRegion = '';
+let selectedProducts = [];
+let step = 1;
+let nameVal = '';
+let phoneVal = '';
+
+async function loadCounts() {
+  try {
+    const res = await fetch('http://127.0.0.1:8000/counts');
+    const data = await res.json();
+    for (const [region, cnt] of Object.entries(data)) {
+      const el = document.getElementById('cnt-' + region);
+      if (el) el.textContent = cnt;
+    }
+  } catch(e) {}
+}
+
+loadCounts();
+
+function openModal(region) {
+  currentRegion = region;
+  step = 1;
+  selectedProducts = [];
+  nameVal = ''; phoneVal = '';
+  renderModal();
+  document.getElementById('modalBg').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalBg').classList.remove('open');
+}
+
+function renderModal() {
+  const box = document.getElementById('modalBox');
+  if (step === 1) {
+    box.innerHTML = `
+      <div class="modal-title">${currentRegion} 신청</div>
+      <div class="modal-step">1단계 · 연락처 입력</div>
+      <label>이름</label>
+      <input type="text" id="inp-name" placeholder="홍길동" value="${nameVal}" />
+      <label>전화번호</label>
+      <input type="tel" id="inp-phone" placeholder="010-0000-0000" value="${phoneVal}" />
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="closeModal()">취소</button>
+        <button class="btn-primary" onclick="goStep2()">다음</button>
+      </div>
+    `;
+  } else if (step === 2) {
+    box.innerHTML = `
+      <div class="modal-title">${currentRegion} 신청</div>
+      <div class="modal-step">2단계 · 설치 항목 선택 (복수 선택 가능)</div>
+      <div class="product-list">
+        ${products.map(p => `
+          <div class="product-item${selectedProducts.includes(p.id) ? ' selected' : ''}" onclick="toggleProduct('${p.id}')">
+            <span>${p.icon}</span>${p.label}
+          </div>
+        `).join('')}
+      </div>
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="step=1;renderModal()">이전</button>
+        <button class="btn-primary" onclick="submit()">신청 완료</button>
+      </div>
+    `;
+  } else if (step === 3) {
+    box.innerHTML = `
+      <div class="success-box">
+        <div class="success-icon">✅</div>
+        <h3>신청 완료!</h3>
+        <p>${currentRegion} 지역 신청이 접수되었습니다.<br>인원이 모이면 문자로 일정을 안내드립니다.</p>
+        <div class="btn-row" style="margin-top:1.25rem;">
+          <button class="btn-primary" onclick="closeModal()">확인</button>
+        </div>
+      </div>
+    `;
+  }
+}
+
+function goStep2() {
+  nameVal = document.getElementById('inp-name').value.trim();
+  phoneVal = document.getElementById('inp-phone').value.trim();
+  if (!nameVal || !phoneVal) { alert('이름과 전화번호를 입력해주세요.'); return; }
+  step = 2;
+  renderModal();
+}
+
+function toggleProduct(id) {
+  if (selectedProducts.includes(id)) {
+    selectedProducts = selectedProducts.filter(x => x !== id);
+  } else {
+    selectedProducts.push(id);
+  }
+  renderModal();
+}
+
+async function submit() {
+  if (selectedProducts.length === 0) {
+    alert('설치 항목을 하나 이상 선택해주세요.');
+    return;
+  }
+
+  try {
+    await fetch('http://127.0.0.1:8000/apply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        region: currentRegion,
+        name: nameVal,
+        phone: phoneVal,
+        products: selectedProducts
+      })
+    });
+    const key = 'cnt-' + currentRegion;
+    const el = document.getElementById(key);
+    if (el) el.textContent = parseInt(el.textContent) + 1;
+  } catch(e) {
+    alert('서버 연결 실패. 서버가 실행중인지 확인해주세요.');
+    return;
+  }
+
+  step = 3;
+  renderModal();
+}
+
+document.getElementById('modalBg').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
