@@ -72,3 +72,15 @@ def counts():
     cur.close()
     conn.close()
     return {row[0]: row[1] for row in rows}
+@app.get("/applications")
+def get_applications():
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("SELECT id, region, name, phone, products, created_at FROM applications ORDER BY created_at DESC")
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+    return [
+        {"id": r[0], "region": r[1], "name": r[2], "phone": r[3], "products": r[4], "created_at": r[5]}
+        for r in rows
+    ]
