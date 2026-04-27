@@ -6,6 +6,7 @@
 <title>관리자 페이지</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
@@ -15,353 +16,289 @@
     padding: 2rem 1.5rem;
   }
 
-
   header {
-    display: flex; align-items: center;
+    display: flex;
+    align-items: center;
     justify-content: space-between;
-    margin-bottom: 1.5rem; flex-wrap: wrap; gap: 12px;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 12px;
   }
-  header h1 { font-size: 20px; font-weight: 700; color: #1a1a1a; }
 
-  /* 탭 */
-  .tabs { display: flex; gap: 8px; margin-bottom: 1.5rem; }
-  .tab-btn {
-    background: #fff; border: 1px solid #e0e0e0; border-radius: 8px;
-    padding: 8px 18px; font-size: 13px; font-weight: 500;
-    font-family: 'Noto Sans KR', sans-serif;
-    cursor: pointer; color: #555; transition: all .15s;
+  header h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
   }
-  .tab-btn.active { background: #2563eb; color: #fff; border-color: #2563eb; }
 
-  /* 공통 패널 */
-  .panel { display: none; }
-  .panel.active { display: block; }
-
-  /* ── 신청 목록 탭 ── */
   .btn-excel {
-    background: #16a34a; color: #fff; border: none; border-radius: 8px;
-    padding: 9px 18px; font-size: 14px; font-weight: 700;
-    cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+    background: #16a34a;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 18px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: background 0.15s;
   }
+
   .btn-excel:hover { background: #15803d; }
 
-  .stats { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1.5rem; }
-  .stat-card {
-    background: #fff; border: 1px solid #e8e8e8; border-radius: 10px;
-    padding: 10px 16px; font-size: 13px; color: #555;
-    display: flex; align-items: center; gap: 8px;
+  .stats {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
   }
-  .stat-card strong { font-size: 18px; font-weight: 700; color: #2563eb; }
+
+  .stat-card {
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 13px;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .stat-card strong {
+    font-size: 18px;
+    font-weight: 700;
+    color: #2563eb;
+  }
 
   .table-wrap {
-    background: #fff; border-radius: 12px;
-    border: 1px solid #e8e8e8; overflow: hidden;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #e8e8e8;
+    overflow: hidden;
   }
+
   .table-header {
-    display: flex; align-items: center;
+    display: flex;
+    align-items: center;
     justify-content: space-between;
-    padding: 14px 18px; border-bottom: 1px solid #f0f0f0;
+    padding: 14px 18px;
+    border-bottom: 1px solid #f0f0f0;
   }
-  .table-header span { font-size: 14px; font-weight: 700; color: #1a1a1a; }
+
+  .table-header span {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+
   .search-input {
-    padding: 7px 12px; border-radius: 8px; border: 1px solid #e0e0e0;
-    font-size: 13px; font-family: 'Noto Sans KR', sans-serif;
-    color: #1a1a1a; width: 200px;
+    padding: 7px 12px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    font-size: 13px;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: #1a1a1a;
+    width: 200px;
   }
+
   .search-input:focus { outline: none; border-color: #2563eb; }
 
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
   thead th {
-    background: #f9f9f7; padding: 10px 14px; text-align: left;
-    font-weight: 500; color: #888; border-bottom: 1px solid #f0f0f0;
+    background: #f9f9f7;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 500;
+    color: #888;
+    border-bottom: 1px solid #f0f0f0;
     white-space: nowrap;
   }
-  tbody tr { border-bottom: 1px solid #f5f5f5; transition: background .1s; }
+
+  tbody tr {
+    border-bottom: 1px solid #f5f5f5;
+    transition: background 0.1s;
+  }
+
   tbody tr:hover { background: #fafafa; }
   tbody tr:last-child { border-bottom: none; }
-  tbody td { padding: 10px 14px; color: #1a1a1a; vertical-align: middle; }
+
+  tbody td {
+    padding: 10px 14px;
+    color: #1a1a1a;
+    vertical-align: middle;
+  }
 
   .region-badge {
-    background: #eff4ff; color: #2563eb; border-radius: 6px;
-    padding: 2px 8px; font-size: 12px; font-weight: 500; white-space: nowrap;
+    background: #eff4ff;
+    color: #2563eb;
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
   }
-  .product-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+
+  .product-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
   .product-tag {
-    background: #f3f4f6; color: #555; border-radius: 4px;
-    padding: 2px 7px; font-size: 11px;
+    background: #f3f4f6;
+    color: #555;
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-size: 11px;
   }
+
   .btn-delete {
-    background: transparent; border: 1px solid #fca5a5; color: #dc2626;
-    border-radius: 6px; padding: 4px 10px; font-size: 12px;
-    cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+    background: transparent;
+    border: 1px solid #fca5a5;
+    color: #dc2626;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'Noto Sans KR', sans-serif;
+    transition: all 0.12s;
   }
+
   .btn-delete:hover { background: #fef2f2; }
-  .date-text { color: #aaa; font-size: 12px; white-space: nowrap; }
-  .empty { text-align: center; padding: 3rem; color: #aaa; font-size: 14px; }
 
-  /* ── 설치 항목 탭 ── */
-  .card {
-    background: #fff; border-radius: 12px;
-    border: 1px solid #e8e8e8; padding: 20px 24px;
-  }
-  .card-title {
-    font-size: 14px; font-weight: 700; color: #1a1a1a; margin-bottom: 16px;
+  .empty {
+    text-align: center;
+    padding: 3rem;
+    color: #aaa;
+    font-size: 14px;
   }
 
-  .product-row {
-    display: flex; align-items: center; gap: 8px;
-    padding: 8px 0; border-bottom: 1px solid #f5f5f5;
+  .date-text {
+    color: #aaa;
+    font-size: 12px;
+    white-space: nowrap;
   }
-  .product-row:last-child { border-bottom: none; }
-  .order-num { color: #bbb; font-size: 12px; width: 20px; text-align: center; }
-
-  .inp {
-    padding: 7px 10px; border-radius: 7px; border: 1px solid #e0e0e0;
-    font-size: 13px; font-family: 'Noto Sans KR', sans-serif; color: #1a1a1a;
-  }
-  .inp:focus { outline: none; border-color: #2563eb; }
-  .inp-key   { width: 110px; background: #f9f9f7; color: #888; }
-  .inp-label { width: 160px; }
-
-  .btn-save {
-    background: #2563eb; color: #fff; border: none; border-radius: 6px;
-    padding: 6px 12px; font-size: 12px; font-weight: 700;
-    cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
-  }
-  .btn-save:hover { background: #1d4ed8; }
-
-  .add-row {
-    display: flex; align-items: center; gap: 8px;
-    padding-top: 16px; flex-wrap: wrap;
-  }
-  .btn-add {
-    background: #16a34a; color: #fff; border: none; border-radius: 7px;
-    padding: 7px 16px; font-size: 13px; font-weight: 700;
-    cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
-  }
-  .btn-add:hover { background: #15803d; }
-
-  .toast {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-    background: #1a1a1a; color: #fff; border-radius: 8px;
-    padding: 10px 20px; font-size: 13px;
-    opacity: 0; transition: opacity .25s; pointer-events: none; z-index: 999;
-  }
-  .toast.show { opacity: 1; }
 </style>
 </head>
 <body>
 
 <header>
   <h1>신청 관리</h1>
-  <button class="btn-excel" id="excel-btn" onclick="exportCSV()">엑셀 다운로드</button>
+  <button class="btn-excel" onclick="exportCSV()">엑셀 다운로드</button>
 </header>
 
-<!-- 탭 -->
-<div class="tabs">
-  <button class="tab-btn active" onclick="showTab('applications')">신청 목록</button>
-  <button class="tab-btn"        onclick="showTab('products')">설치 항목 관리</button>
-</div>
+<div class="stats" id="stats"></div>
 
-<!-- 패널 1: 신청 목록 -->
-<div id="panel-applications" class="panel active">
-  <div class="stats" id="stats"></div>
-  <div class="table-wrap">
-    <div class="table-header">
-      <span id="total-label">전체 0건</span>
-      <input class="search-input" type="text" placeholder="이름 또는 지역 검색"
-             oninput="filterTable(this.value)" />
-    </div>
-    <table>
-      <thead>
-        <tr>
-          <th>#</th><th>지역</th><th>이름</th>
-          <th>전화번호</th><th>설치 항목</th><th>신청일시</th><th>삭제</th>
-        </tr>
-      </thead>
-      <tbody id="tbody"></tbody>
-    </table>
+<div class="table-wrap">
+  <div class="table-header">
+    <span id="total-label">전체 0건</span>
+    <input class="search-input" type="text" placeholder="이름 또는 지역 검색" oninput="filterTable(this.value)" />
   </div>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>지역</th>
+        <th>이름</th>
+        <th>전화번호</th>
+        <th>설치 항목</th>
+        <th>신청일시</th>
+        <th>삭제</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
 </div>
-
-<!-- 패널 2: 설치 항목 관리 -->
-<div id="panel-products" class="panel">
-  <div class="card">
-    <div class="card-title">설치 항목 목록</div>
-    <div id="product-list"></div>
-    <div class="add-row">
-      <input class="inp inp-key"   id="new-key"   placeholder="key (영문)">
-      <input class="inp inp-label" id="new-label" placeholder="표시 이름 (예: 에어컨)">
-      <button class="btn-add" onclick="addProduct()">+ 추가</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
 
 <script>
-const API = 'https://web-production-cf4fa.up.railway.app';
+const API = '';
+const productLabels = {
+  aircon: '에어컨',
+  tv: 'TV 벽걸이',
+  cctv: 'CCTV',
+  led: 'LED 조명',
+  shelf: '선반·수납'
+};
 
-/* ── 토스트 ── */
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2000);
-}
-
-/* ── 탭 전환 ── */
-function showTab(name) {
-  document.querySelectorAll('.tab-btn').forEach((b, i) =>
-    b.classList.toggle('active', ['applications','products'][i] === name)
-  );
-  document.getElementById('panel-applications').classList.toggle('active', name === 'applications');
-  document.getElementById('panel-products').classList.toggle('active', name === 'products');
-  document.getElementById('excel-btn').style.display = name === 'applications' ? '' : 'none';
-  if (name === 'products') loadProducts();
-}
-
-/* ══════════════════════════════
-   신청 목록
-══════════════════════════════ */
 let allData = [];
-let productLabels = {};  // key → label (동적)
 
 async function loadData() {
   try {
-    // 항목 라벨 먼저 가져오기
-    const prods = await fetch(API + '/products').then(r => r.json());
-    prods.forEach(p => productLabels[p.key] = p.label);
-
     const res = await fetch(API + '/applications');
     allData = await res.json();
     renderStats();
     renderTable(allData);
   } catch(e) {
-    document.getElementById('tbody').innerHTML =
-      '<tr><td colspan="7" class="empty">데이터를 불러오지 못했습니다.</td></tr>';
+    document.getElementById('tbody').innerHTML = '<tr><td colspan="7" class="empty">데이터를 불러오지 못했습니다.</td></tr>';
   }
 }
 
 function renderStats() {
   const counts = {};
-  allData.forEach(r => { counts[r.region] = (counts[r.region] || 0) + 1; });
+  allData.forEach(r => {
+    counts[r.region] = (counts[r.region] || 0) + 1;
+  });
+  const statsEl = document.getElementById('stats');
   let html = `<div class="stat-card">전체 <strong>${allData.length}</strong>명</div>`;
-  for (const [region, cnt] of Object.entries(counts))
+  for (const [region, cnt] of Object.entries(counts)) {
     html += `<div class="stat-card">${region} <strong>${cnt}</strong>명</div>`;
-  document.getElementById('stats').innerHTML = html;
+  }
+  statsEl.innerHTML = html;
 }
 
 function renderTable(data) {
   document.getElementById('total-label').textContent = `전체 ${data.length}건`;
   const tbody = document.getElementById('tbody');
-  if (!data.length) {
+  if (data.length === 0) {
     tbody.innerHTML = '<tr><td colspan="7" class="empty">신청 내역이 없습니다.</td></tr>';
     return;
   }
   tbody.innerHTML = data.map(r => {
     let products = [];
-    try { products = JSON.parse(r.products); } catch { products = [r.products]; }
-    const tags = products.map(p =>
-      `<span class="product-tag">${productLabels[p] || p}</span>`).join('');
-    const date = r.created_at ? r.created_at.substring(0,16).replace('T',' ') : '';
+    try { products = JSON.parse(r.products); } catch(e) { products = [r.products]; }
+    const productHTML = products.map(p => `<span class="product-tag">${productLabels[p] || p}</span>`).join('');
+    const date = r.created_at ? r.created_at.substring(0, 16).replace('T', ' ') : '';
     return `
       <tr id="row-${r.id}">
         <td style="color:#aaa;">${r.id}</td>
         <td><span class="region-badge">${r.region}</span></td>
         <td><strong>${r.name}</strong></td>
         <td>${r.phone}</td>
-        <td><div class="product-tags">${tags}</div></td>
+        <td><div class="product-tags">${productHTML}</div></td>
         <td class="date-text">${date}</td>
         <td><button class="btn-delete" onclick="deleteRow(${r.id})">삭제</button></td>
-      </tr>`;
+      </tr>
+    `;
   }).join('');
 }
 
 function filterTable(query) {
   const q = query.trim().toLowerCase();
-  renderTable(!q ? allData : allData.filter(r =>
+  if (!q) { renderTable(allData); return; }
+  const filtered = allData.filter(r =>
     r.name.toLowerCase().includes(q) || r.region.toLowerCase().includes(q) || r.phone.includes(q)
-  ));
+  );
+  renderTable(filtered);
 }
 
 async function deleteRow(id) {
   if (!confirm('정말 삭제하시겠습니까?')) return;
   await fetch(API + '/applications/' + id, { method: 'DELETE' });
   allData = allData.filter(r => r.id !== id);
-  renderStats(); renderTable(allData);
+  renderStats();
+  renderTable(allData);
 }
 
-function exportCSV() { window.location.href = API + '/export'; }
-
-/* ══════════════════════════════
-   설치 항목 관리
-══════════════════════════════ */
-let productList = [];
-
-async function loadProducts() {
-  productList = await fetch(API + '/products').then(r => r.json());
-  renderProductList();
+function exportCSV() {
+  window.location.href = API + '/export';
 }
 
-function renderProductList() {
-  const el = document.getElementById('product-list');
-  if (!productList.length) {
-    el.innerHTML = '<p style="color:#aaa;font-size:13px;padding:8px 0;">항목이 없습니다.</p>';
-    return;
-  }
-  el.innerHTML = productList.map((p, i) => `
-    <div class="product-row">
-      <span class="order-num">${i + 1}</span>
-      <input class="inp inp-key" value="${p.key}" disabled title="key는 변경 불가">
-      <input class="inp inp-label" id="lbl-${p.key}" value="${p.label}">
-      <button class="btn-save" onclick="saveProduct('${p.key}', ${i})">저장</button>
-      <button class="btn-delete" onclick="deleteProduct('${p.key}', '${p.label}')">삭제</button>
-    </div>
-  `).join('');
-}
-
-async function saveProduct(key, sort_order) {
-  const label = document.getElementById('lbl-' + key).value.trim();
-  if (!label) return toast('이름을 입력하세요.');
-  await fetch(API + '/products/' + key, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ key, label, sort_order })
-  });
-  productLabels[key] = label;
-  toast('저장되었습니다.');
-  loadProducts();
-}
-
-async function deleteProduct(key, label) {
-  if (!confirm(`'${label}' 항목을 삭제할까요?\n기존 신청 데이터의 항목 표시에 영향을 줄 수 있습니다.`)) return;
-  await fetch(API + '/products/' + key, { method: 'DELETE' });
-  toast('삭제되었습니다.');
-  loadProducts();
-}
-
-async function addProduct() {
-  const key   = document.getElementById('new-key').value.trim().replace(/\s+/g, '');
-  const label = document.getElementById('new-label').value.trim();
-  if (!key)   return toast('key를 입력하세요 (영문).');
-  if (!label) return toast('표시 이름을 입력하세요.');
-  const res = await fetch(API + '/products', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ key, label, sort_order: productList.length })
-  });
-  if (!res.ok) {
-    const e = await res.json();
-    return toast(e.detail || '추가 실패');
-  }
-  document.getElementById('new-key').value   = '';
-  document.getElementById('new-label').value = '';
-  toast('추가되었습니다.');
-  loadProducts();
-}
-
-/* ── 초기 로드 ── */
 loadData();
 </script>
 </body>
